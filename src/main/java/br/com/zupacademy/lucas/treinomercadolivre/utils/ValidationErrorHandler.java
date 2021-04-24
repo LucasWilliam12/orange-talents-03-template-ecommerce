@@ -13,6 +13,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import br.com.zupacademy.lucas.treinomercadolivre.controllers.exceptions.ObjectNotFoundException;
+
 @RestControllerAdvice
 public class ValidationErrorHandler {
 	
@@ -27,6 +29,15 @@ public class ValidationErrorHandler {
 		ValidationErrorsOutputDto errors = buildValidationErrors(globalErrors, fieldsErrors);
 		
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+	}
+	
+	@ExceptionHandler(ObjectNotFoundException.class)
+	public ResponseEntity<ValidationErrorsOutputDto> handleObjectNotFoundException(ObjectNotFoundException exception) {
+
+		ValidationErrorsOutputDto errors = new ValidationErrorsOutputDto();
+		errors.addFieldError(exception.getField(), messageSource.getMessage(null, null, exception.getMessage(),  LocaleContextHolder.getLocale()));
+		
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
 	}
 	
 

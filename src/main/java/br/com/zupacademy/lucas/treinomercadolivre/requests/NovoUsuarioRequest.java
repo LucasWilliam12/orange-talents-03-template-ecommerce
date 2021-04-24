@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 
+import br.com.zupacademy.lucas.treinomercadolivre.controllers.validators.UniqueData;
 import br.com.zupacademy.lucas.treinomercadolivre.models.SenhaLimpa;
 import br.com.zupacademy.lucas.treinomercadolivre.models.Usuario;
 
@@ -13,13 +14,14 @@ public class NovoUsuarioRequest {
 	
 	// Atributos
 	@NotBlank @NotNull
-	@Email
+	@Email @UniqueData(domainClass = Usuario.class, fieldName = "email")
 	private String email;
 	@NotBlank @NotNull @Length(min = 6)
 	private String senha;
 	
 	// Controllers
-	public NovoUsuarioRequest(@NotBlank @NotNull @Email String email, @NotBlank @Length(min = 6) @NotNull String senha) {
+	public NovoUsuarioRequest(@NotBlank @NotNull @Email @UniqueData(domainClass = Usuario.class, fieldName = "email") String email, 
+			@NotBlank @Length(min = 6) @NotNull String senha) {
 		this.email = email;
 		this.senha = senha;
 	}

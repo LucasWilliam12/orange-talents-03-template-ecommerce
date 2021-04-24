@@ -26,7 +26,7 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotBlank @NotNull @Email
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String email;
 	@NotBlank @NotNull @Length(min = 6)
 	@Column(nullable = false)
