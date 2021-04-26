@@ -52,6 +52,8 @@ public class Produto {
 	@ManyToOne
 	private Usuario dono;
 	private LocalDate instante = LocalDate.now();
+	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
+	private Set<ImagemProduto> imagens = new HashSet<>();
 	
 	// Construtores
 	@Deprecated
@@ -103,4 +105,27 @@ public class Produto {
 	public LocalDate getInstante() {
 		return instante;
 	}
+
+	public void associaImagens(Set<String> links) {
+		Set<ImagemProduto> imagens =links.stream().map(link -> new ImagemProduto(this, link)).collect(Collectors.toSet());
+		this.imagens.addAll(imagens);
+		
+	}
+	
+	public Set<ImagemProduto> getImagens() {
+		return imagens;
+	}
+
+	@Override
+	public String toString() {
+		return "Produto [id=" + id + ", nome=" + nome + ", valor=" + valor + ", quantidade=" + quantidade
+				+ ", descricao=" + descricao + ", categoria=" + categoria + ", caracteristicas=" + caracteristicas
+				+ ", dono=" + dono + ", instante=" + instante + ", imagens=" + imagens + "]";
+	}
+
+	public boolean pertenceAoUsuario(Usuario dono2) {
+		return this.dono.equals(dono2);
+	}
+	
+	
 }

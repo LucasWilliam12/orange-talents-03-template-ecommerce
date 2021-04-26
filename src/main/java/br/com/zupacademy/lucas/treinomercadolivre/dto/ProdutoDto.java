@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import br.com.zupacademy.lucas.treinomercadolivre.models.CaracteristicaProduto;
+import br.com.zupacademy.lucas.treinomercadolivre.models.ImagemProduto;
 import br.com.zupacademy.lucas.treinomercadolivre.models.Produto;
 
 public class ProdutoDto {
@@ -18,6 +19,7 @@ public class ProdutoDto {
 	private Set<CaracteristicaProduto> caracteristicas = new HashSet<>();
 	private UsuarioDto dono;
 	private NovaCategoriaDto categoria;
+	private Set<ImagemProduto> imagens;
 	
 	
 	public ProdutoDto(Produto produto) {
@@ -29,6 +31,7 @@ public class ProdutoDto {
 		this.caracteristicas = produto.getCaracteristicas();
 		this.dono = new UsuarioDto(produto.getDono());
 		this.categoria = new NovaCategoriaDto(produto.getCategoria());
+		this.imagens = produto.getImagens();
 	}
 
 	public String getNome() {
@@ -70,5 +73,7 @@ public class ProdutoDto {
 		return categoria;
 	}
 	
-	
+	public Set<ImagemProduto> getImagens() {
+		return imagens;
+	}
 }
