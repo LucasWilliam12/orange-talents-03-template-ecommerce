@@ -1,12 +1,15 @@
 package br.com.zupacademy.lucas.treinomercadolivre.models;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -16,6 +19,8 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "usuarios")
@@ -32,6 +37,9 @@ public class Usuario {
 	@Column(nullable = false)
 	private String senha;
 	private LocalDate instante = LocalDate.now();
+	@JsonIgnore
+	@OneToMany(mappedBy = "dono")
+	private List<Produto> produtos = new ArrayList<>();
 	
 	// Construtores
 	@Deprecated
@@ -62,5 +70,12 @@ public class Usuario {
 	public LocalDate getInstante() {
 		return instante;
 	}
-
+	
+	public List<Produto> getProdutos() {
+		return produtos;
+	}
+	
+	public void addProduto(Produto produto) {
+		this.produtos.add(produto);
+	}
 }

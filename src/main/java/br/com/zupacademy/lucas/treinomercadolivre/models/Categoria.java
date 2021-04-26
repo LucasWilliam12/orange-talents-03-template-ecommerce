@@ -1,17 +1,23 @@
 package br.com.zupacademy.lucas.treinomercadolivre.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "categorias")
@@ -26,6 +32,9 @@ public class Categoria {
 	private String nome;
 	@ManyToOne
 	private Categoria categoriaMae;
+	@JsonIgnore
+	@OneToMany(mappedBy = "categoria")
+	private List<Produto> produtos = new ArrayList<>();
 	
 	// Construtores
 	public Categoria() {
@@ -54,4 +63,7 @@ public class Categoria {
 		return this.categoriaMae;
 	}
 	
+	public void addProduto(Produto produto) {
+		this.produtos.add(produto);
+	}
 }
