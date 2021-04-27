@@ -59,8 +59,11 @@ public class Produto {
 	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
 	private Set<ImagemProduto> imagens = new HashSet<>();
 	@JsonIgnore
-	@OneToMany(mappedBy = "produto")
+	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
 	private List<Opiniao> opnioes = new ArrayList<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
+	private List<Pergunta> perguntas = new ArrayList<>();
 	
 	// Construtores
 	@Deprecated
@@ -122,13 +125,13 @@ public class Produto {
 	public Set<ImagemProduto> getImagens() {
 		return imagens;
 	}
-	
-	public void addOpniao(Opiniao opniao) {
-		this.opnioes.add(opniao);
-	}
-	
+
 	public List<Opiniao> getOpnioes() {
 		return opnioes;
+	}
+	
+	public List<Pergunta> getPerguntas() {
+		return perguntas;
 	}
 
 	@Override

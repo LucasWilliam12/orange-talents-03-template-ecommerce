@@ -15,41 +15,45 @@ import org.springframework.web.server.ResponseStatusException;
 
 import br.com.zupacademy.lucas.treinomercadolivre.config.security.UsuarioLogado;
 import br.com.zupacademy.lucas.treinomercadolivre.controllers.exceptions.ObjectNotFoundException;
-import br.com.zupacademy.lucas.treinomercadolivre.dto.OpiniaoDto;
-import br.com.zupacademy.lucas.treinomercadolivre.models.Opiniao;
+import br.com.zupacademy.lucas.treinomercadolivre.dto.PerguntaDto;
+import br.com.zupacademy.lucas.treinomercadolivre.models.Pergunta;
 import br.com.zupacademy.lucas.treinomercadolivre.models.Produto;
 import br.com.zupacademy.lucas.treinomercadolivre.models.Usuario;
-import br.com.zupacademy.lucas.treinomercadolivre.repositories.OpniaoRepository;
+import br.com.zupacademy.lucas.treinomercadolivre.repositories.PerguntaRepository;
 import br.com.zupacademy.lucas.treinomercadolivre.repositories.ProdutoRepository;
 import br.com.zupacademy.lucas.treinomercadolivre.repositories.UsuarioRepository;
-import br.com.zupacademy.lucas.treinomercadolivre.requests.NovaOpiniaoRequest;
+import br.com.zupacademy.lucas.treinomercadolivre.requests.NovaPerguntaRequest;
+import br.com.zupacademy.lucas.treinomercadolivre.utils.EnvioEmail;
 
 @RestController
 @RequestMapping(value = "/produtos")
-public class CadastrarOpiniaoController {
-
+public class CadastrarPerguntaController {
+	
 	@Autowired
 	private ProdutoRepository produtoRepo;
+	
 	@Autowired
 	private UsuarioRepository usuarioRepo;
-	@Autowired
-	private OpniaoRepository opniaoRepo;
 	
-	@PostMapping(value = "/{id}/opnioes")
-	public ResponseEntity<OpiniaoDto> cadastrar(@RequestBody @Valid NovaOpiniaoRequest request, 
-			@PathVariable("id") Long id, @AuthenticationPrincipal UsuarioLogado logado) {
+	@Autowired
+	private PerguntaRepository perguntaRepo;
+	
+	@Autowired
+	private EnvioEmail envioEmail;
+	
+	@PostMapping(value = "/{id}/pergunta")
+	public ResponseEntity<PerguntaDto> cadastrar(@RequestBody @Valid NovaPerguntaRequest request,
+			@PathVariable("id") Long id, @AuthenticationPrincipal UsuarioLogado logado){
 		Produto produto = produtoRepo.findById(id).orElseThrow(() -> new ObjectNotFoundException("O produto não foi encontrado com id informado: "+id));
-		Usuario usuario = usuarioRepo.findByEmail(logado.getUsername()).orElseThrow(() -> new ObjectNotFoundException("O usuario informado não foi encontrado"));
+		Usuario consumidor = usuarioRepo.findByEmail(logado.getUsername()).orElseThrow(() -> new ObjectNotFoundException("O usuario informado não foi encontrado"));
 		
-		if(produto.pertenceAoUsuario(usuario)) {
+		if(produto.pertenceAoUsuario(consumidor)) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 		}
 		
-		Opiniao opniao = request.toModel(usuario, produto);
-		
-		opniao = opniaoRepo.save(opniao);
-		
-		return ResponseEntity.ok(new OpiniaoDto(opniao));
+		Pergunta pergunta = perguntaRepo.save(request.toModel(produto, consumidor));
+		envioEmail.sendEmail(consumidor.getEmail(), "email@system.com", "<html>"+pergunta.getTitulo()+"</html>");
+		return ResponseEntity.ok(new PerguntaDto(pergunta));
 	}
 	
 }

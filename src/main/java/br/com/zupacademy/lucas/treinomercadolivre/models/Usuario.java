@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -41,8 +42,11 @@ public class Usuario {
 	@OneToMany(mappedBy = "dono")
 	private List<Produto> produtos = new ArrayList<>();
 	@JsonIgnore
-	@OneToMany(mappedBy = "consumidor")
+	@OneToMany(mappedBy = "consumidor", cascade = CascadeType.MERGE)
 	private List<Opiniao> opnioes = new ArrayList<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "consumidor", cascade = CascadeType.MERGE)
+	private List<Pergunta> perguntas = new ArrayList<>();
 	
 	// Construtores
 	@Deprecated
@@ -82,12 +86,12 @@ public class Usuario {
 		this.produtos.add(produto);
 	}
 
-	public void addOpniao(Opiniao opniao) {
-		this.opnioes.add(opniao);
-	}
-	
 	public List<Opiniao> getOpnioes() {
 		return opnioes;
+	}
+	
+	public List<Pergunta> getPerguntas() {
+		return perguntas;
 	}
 	
 	@Override
