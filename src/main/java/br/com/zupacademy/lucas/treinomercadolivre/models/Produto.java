@@ -2,8 +2,10 @@ package br.com.zupacademy.lucas.treinomercadolivre.models;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.util.Assert;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.zupacademy.lucas.treinomercadolivre.requests.CaracteristicasRequest;
 
@@ -54,6 +58,9 @@ public class Produto {
 	private LocalDate instante = LocalDate.now();
 	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
 	private Set<ImagemProduto> imagens = new HashSet<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "produto")
+	private List<Opiniao> opnioes = new ArrayList<>();
 	
 	// Construtores
 	@Deprecated
@@ -114,6 +121,14 @@ public class Produto {
 	
 	public Set<ImagemProduto> getImagens() {
 		return imagens;
+	}
+	
+	public void addOpniao(Opiniao opniao) {
+		this.opnioes.add(opniao);
+	}
+	
+	public List<Opiniao> getOpnioes() {
+		return opnioes;
 	}
 
 	@Override

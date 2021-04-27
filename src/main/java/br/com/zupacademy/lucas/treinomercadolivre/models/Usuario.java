@@ -40,6 +40,9 @@ public class Usuario {
 	@JsonIgnore
 	@OneToMany(mappedBy = "dono")
 	private List<Produto> produtos = new ArrayList<>();
+	@JsonIgnore
+	@OneToMany(mappedBy = "consumidor")
+	private List<Opiniao> opnioes = new ArrayList<>();
 	
 	// Construtores
 	@Deprecated
@@ -79,6 +82,14 @@ public class Usuario {
 		this.produtos.add(produto);
 	}
 
+	public void addOpniao(Opiniao opniao) {
+		this.opnioes.add(opniao);
+	}
+	
+	public List<Opiniao> getOpnioes() {
+		return opnioes;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

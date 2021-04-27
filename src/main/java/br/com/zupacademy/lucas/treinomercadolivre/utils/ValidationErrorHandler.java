@@ -7,6 +7,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -40,6 +41,16 @@ public class ValidationErrorHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errors);
 	}
 	
+	
+	@ExceptionHandler(BindException.class)
+	public ResponseEntity<ValidationErrorsOutputDto> handleValidationBindError(BindException exception) {
+		List<ObjectError> globalErrors = exception.getBindingResult().getGlobalErrors();
+		List<FieldError> fieldsErrors = exception.getBindingResult().getFieldErrors();
+		
+		ValidationErrorsOutputDto errors = buildValidationErrors(globalErrors, fieldsErrors);
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+	}
 
 	private ValidationErrorsOutputDto buildValidationErrors(List<ObjectError> globalErrors,
 			List<FieldError> fieldsErrors) {
