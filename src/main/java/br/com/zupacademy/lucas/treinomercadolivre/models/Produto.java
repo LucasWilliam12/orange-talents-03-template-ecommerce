@@ -7,6 +7,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
@@ -17,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -29,6 +33,7 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.zupacademy.lucas.treinomercadolivre.dto.CaracteristicaProdutoDto;
 import br.com.zupacademy.lucas.treinomercadolivre.requests.CaracteristicasRequest;
 
 @Entity
@@ -59,11 +64,12 @@ public class Produto {
 	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
 	private Set<ImagemProduto> imagens = new HashSet<>();
 	@JsonIgnore
-	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
+	@OneToMany(mappedBy = "produto")
 	private List<Opiniao> opnioes = new ArrayList<>();
 	@JsonIgnore
-	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
-	private List<Pergunta> perguntas = new ArrayList<>();
+	@OneToMany(mappedBy = "produto")
+	@OrderBy("titulo asc")
+	private SortedSet<Pergunta> perguntas = new TreeSet<>();
 	
 	// Construtores
 	@Deprecated
@@ -130,20 +136,71 @@ public class Produto {
 		return opnioes;
 	}
 	
-	public List<Pergunta> getPerguntas() {
+	public SortedSet<Pergunta> getPerguntas() {
 		return perguntas;
-	}
-
-	@Override
-	public String toString() {
-		return "Produto [id=" + id + ", nome=" + nome + ", valor=" + valor + ", quantidade=" + quantidade
-				+ ", descricao=" + descricao + ", categoria=" + categoria + ", caracteristicas=" + caracteristicas
-				+ ", dono=" + dono + ", instante=" + instante + ", imagens=" + imagens + "]";
 	}
 
 	public boolean pertenceAoUsuario(Usuario dono2) {
 		return this.dono.equals(dono2);
 	}
+
+	public Set<CaracteristicaProdutoDto> converteCaracteristicasEmDto(Function<CaracteristicaProduto, CaracteristicaProdutoDto> funcao) {
+		return this.caracteristicas.stream().map(funcao).collect(Collectors.toSet());
+	}
+
+	public <T> Set<T> converteLinksEmStrings(Function<ImagemProduto, T> funcao) {
+		return this.imagens.stream().map(funcao).collect(Collectors.toSet());
+	}
+
+	public <T extends Comparable<T> > SortedSet<T> convertePerguntasEmString(Function<Pergunta, T> funcao) {
+		return this.perguntas.stream().map(funcao).collect(Collectors.toCollection(TreeSet::new));
+	}
 	
-	
+	public <T> Set<T> converteOpinioes(Function<Opiniao, T> funcao) {
+		return this.opnioes.stream().map(funcao).collect(Collectors.toSet());
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((categoria == null) ? 0 : categoria.hashCode());
+		result = prime * result + ((descricao == null) ? 0 : descricao.hashCode());
+		result = prime * result + ((dono == null) ? 0 : dono.hashCode());
+		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Produto other = (Produto) obj;
+		if (categoria == null) {
+			if (other.categoria != null)
+				return false;
+		} else if (!categoria.equals(other.categoria))
+			return false;
+		if (descricao == null) {
+			if (other.descricao != null)
+				return false;
+		} else if (!descricao.equals(other.descricao))
+			return false;
+		if (dono == null) {
+			if (other.dono != null)
+				return false;
+		} else if (!dono.equals(other.dono))
+			return false;
+		if (nome == null) {
+			if (other.nome != null)
+				return false;
+		} else if (!nome.equals(other.nome))
+			return false;
+		return true;
+	}
+
 }
