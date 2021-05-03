@@ -47,6 +47,8 @@ public class Usuario {
 	@JsonIgnore
 	@OneToMany(mappedBy = "consumidor", cascade = CascadeType.MERGE)
 	private List<Pergunta> perguntas = new ArrayList<>();
+	@OneToMany(mappedBy = "comprador")
+	private List<Compra> compra = new ArrayList<>();
 	
 	// Construtores
 	@Deprecated
@@ -92,6 +94,10 @@ public class Usuario {
 	
 	public List<Pergunta> getPerguntas() {
 		return perguntas;
+	}
+	
+	public List<Compra> getCompra() {
+		return compra;
 	}
 	
 	@Override

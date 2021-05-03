@@ -70,6 +70,8 @@ public class Produto {
 	@OneToMany(mappedBy = "produto")
 	@OrderBy("titulo asc")
 	private SortedSet<Pergunta> perguntas = new TreeSet<>();
+	@OneToMany(mappedBy = "produto")
+	private List<Compra> compra = new ArrayList<>();
 	
 	// Construtores
 	@Deprecated
@@ -144,6 +146,10 @@ public class Produto {
 		return this.dono.equals(dono2);
 	}
 
+	public List<Compra> getCompra() {
+		return compra;
+	}
+	
 	public Set<CaracteristicaProdutoDto> converteCaracteristicasEmDto(Function<CaracteristicaProduto, CaracteristicaProdutoDto> funcao) {
 		return this.caracteristicas.stream().map(funcao).collect(Collectors.toSet());
 	}
@@ -201,6 +207,18 @@ public class Produto {
 		} else if (!nome.equals(other.nome))
 			return false;
 		return true;
+	}
+
+	public boolean abate(int quantidade) {
+		
+		Assert.isTrue(quantidade > 0, "A quantidade não pode ser menor que 0");
+		
+		if(quantidade <= this.quantidade) {
+			this.quantidade-=quantidade;
+			return true;
+		}
+		
+		return false;
 	}
 
 }
