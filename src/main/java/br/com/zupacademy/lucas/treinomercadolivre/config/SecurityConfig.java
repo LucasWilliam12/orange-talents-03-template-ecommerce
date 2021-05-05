@@ -24,7 +24,7 @@ import br.com.zupacademy.lucas.treinomercadolivre.config.security.UserService;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
-	private static final String[] PUBLIC_MATCHERS_POST = {"/usuarios/**", "/login/**"};
+	private static final String[] PUBLIC_MATCHERS_POST = {"/usuarios/**", "/notas-fiscais","/ranking", "/login/**"};
 	
 	@Autowired
 	private UserService userService;

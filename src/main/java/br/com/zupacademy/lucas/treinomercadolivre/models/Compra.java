@@ -1,7 +1,11 @@
 package br.com.zupacademy.lucas.treinomercadolivre.models;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -9,12 +13,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import org.springframework.util.Assert;
+
 import br.com.zupacademy.lucas.treinomercadolivre.dto.enumns.GatewayPagamento;
 import br.com.zupacademy.lucas.treinomercadolivre.dto.enumns.StatusCompra;
+import br.com.zupacademy.lucas.treinomercadolivre.requests.RetornoGatewayPagamento;
 
 @Entity
 @Table(name = "compras")
@@ -40,6 +49,8 @@ public class Compra {
 	@Enumerated
 	@NotNull
 	private StatusCompra status;
+	@OneToMany(mappedBy = "compra", cascade = CascadeType.MERGE)
+	private Set<Transacao> transacoes = new HashSet<>();
 	
 	@Deprecated
 	public Compra() {
@@ -83,6 +94,36 @@ public class Compra {
 	}
 	public StatusCompra getStatus() {
 		return status;
+	}
+
+	public void adicionaTransacao(@Valid RetornoGatewayPagamento request) {
+
+		Transacao novaTransacao = request.toTransacao(this);
+		
+		Assert.isTrue(!this.transacoes.contains(novaTransacao), "Já existe uma transacao igual essa sendo processada");
+		
+		Assert.isTrue(this.transacoesConcoluidasComSucesso().isEmpty(), "Essa compra já foi concluída com sucesso!");
+		
+		this.transacoes.add(request.toTransacao(this));
+	}
+	
+	
+	private Set<Transacao> transacoesConcoluidasComSucesso(){
+		Set<Transacao> transacoesComSucesso = this.transacoes.stream()
+				.filter(transacao -> transacao.concluidaComSucesso())
+				.collect(Collectors.toSet());
+		
+		Assert.isTrue(transacoesComSucesso.size() <= 1, "tem mais uma transacao concluida com sucesso");
+		
+		return transacoesComSucesso;
+	}
+	
+	public boolean processadaComSucesso() {
+		return !this.transacoesConcoluidasComSucesso().isEmpty();
+	}
+
+	public Usuario getDonoProduto() {
+		return produto.getDono();
 	}
 	
 }
